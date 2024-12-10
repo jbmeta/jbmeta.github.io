@@ -22,19 +22,21 @@ header {
     color: #fff;
     padding: 2rem 0;
     text-align: center;
-  }
-  
-  @keyframes gradient-animation {
+}
+
+@keyframes gradient-animation {
     0% {
-      background-position: 0% 50%;
+        background-position: 0% 50%;
     }
+
     50% {
-      background-position: 100% 50%;
+        background-position: 100% 50%;
     }
+
     100% {
-      background-position: 0% 50%;
+        background-position: 0% 50%;
     }
-  }
+}
 
 header h1 {
     font-size: 2.5rem;
