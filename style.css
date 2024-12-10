@@ -1,0 +1,152 @@
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    line-height: 1.3;
+    font-size: 14px;
+    font-family: 'Raleway', sans-serif;
+    background-color: #FFFFFF;
+    color: #1E2D40;
+
+}
+
+/* Header */
+header {
+    background: linear-gradient(135deg, #13259f, #e17735);
+    color: #fff;
+    padding: 2rem 0;
+    text-align: center;
+}
+
+header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+header p {
+    font-size: 1rem;
+    margin-bottom: 1rem;
+}
+
+header .button {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    color: #495579;
+    background: #fff;
+    border-radius: 20px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 0.9rem;
+    transition: background 0.3s ease;
+}
+
+header .button:hover {
+    background: #e7caaf;
+}
+
+/* Main Sections */
+main {
+    padding: 1.5rem;
+}
+
+h2 {
+    font-size: 1.5rem;
+    /* Reduced font size */
+    color: #000c64;
+    /* Neutral tone */
+    margin-bottom: 0.75rem;
+}
+
+section {
+    margin-bottom: 1.5rem;
+}
+
+#about p {
+    font-size: 0.9rem;
+    /* Reduced font size */
+    color: #666;
+    /* Softer tone */
+}
+
+/* Skills Section */
+.skills-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.skill {
+    background: #708090;
+    /* Muted Gray */
+    color: #fff;
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    /* Reduced font size */
+}
+
+/* Experience Section */
+.job {
+    margin-bottom: 1rem;
+}
+
+.job h3 {
+    font-size: 1.2rem;
+    /* Reduced font size */
+    margin-bottom: 0.4rem;
+}
+
+.job h4 {
+    color: #555;
+}
+
+.job p {
+    font-size: 0.85rem;
+    /* Reduced font size */
+    color: #555;
+    /* Neutral tone */
+}
+
+.job ul {
+    list-style-type: disc;
+    margin-left: 1.5rem;
+    font-size: 0.85rem;
+    /* Reduced font size */
+}
+
+/* Footer */
+footer {
+    background: linear-gradient(135deg, #e17735, #13259f);
+    color: #fff;
+    text-align: center;
+    padding: 0.8rem 0;
+    margin-top: 1.5rem;
+}
+
+footer p {
+    font-size: 0.8rem;
+    /* Reduced font size */
+}
+
+#education {
+    margin-bottom: 1.5rem;
+}
+
+.education-item {
+    margin-bottom: 1rem;
+}
+
+.education-item h3 {
+    font-size: 1.2rem;
+    /* color: #5673A6; */
+    margin-bottom: 0.4rem;
+}
+
+.education-item p {
+    font-size: 0.85rem;
+    color: #555;
+}
