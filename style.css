@@ -16,9 +16,9 @@ body {
 
 /* Header styling */
 header {
-    background: linear-gradient(135deg, #e17735, #000c64);
+    background: linear-gradient(135deg, #df6b23, #000c64);
     background-size: 400% 400%;
-    animation: gradient-animation 5s ease infinite;
+    animation: gradient-animation 3s ease infinite;
     color: #fff;
     padding: 2rem 0;
     text-align: center;
@@ -82,7 +82,6 @@ header .contact-section a:hover {
     .job {
         page-break-inside: avoid;
         margin-bottom: 1rem;
-        /* Ensure spacing between job entries */
     }
 
     /* Education items shouldn't break across pages */
@@ -92,13 +91,12 @@ header .contact-section a:hover {
     }
 
     @page {
-        size: A4;
+        size: Letter;
         margin: 1in;
-        margin-top: 2in;
     }
 
     body {
-        margin: 0;
+        font-size: 12pt;
     }
 }
 
