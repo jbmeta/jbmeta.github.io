@@ -9,19 +9,30 @@ body {
     line-height: 1.3;
     font-size: 14px;
     font-family: 'Raleway', sans-serif;
-    background-color: #FFFFFF;
-    color: #1E2D40;
+    background-color: #e6e6e6;
+    color: #5e5e5e;
+    text-align: justify;
 
 }
 
-/* Header styling */
 header {
-    background: linear-gradient(135deg, #df6b23, #000c64);
+    background: linear-gradient(180deg, midnightblue, navy);
     background-size: 400% 400%;
-    animation: gradient-animation 3s ease infinite;
     color: #fff;
     padding: 2rem 0;
     text-align: center;
+}
+
+header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 0 8px darkblue, 0 0 16px darkblue, 0 0 24px darkblue;
+}
+
+header p {
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    text-shadow: 0 0 4px darkblue, 0 0 8px darkblue;
 }
 
 /* Name Section */
@@ -30,29 +41,24 @@ header .name-section {
 }
 
 header .name-section h1 {
-    font-size: 2.5rem;
+    font-size: 2.2rem;
     margin-bottom: 0.5rem;
 }
 
 header .name-section p {
-    font-size: 1rem;
+    font-size: 0.8rem;
 }
 
 /* Contact Section */
 header .contact-section {
-    /* font-family: 'Roboto', sans-serif; */
-    /* Replace with your preferred font */
-    font-size: 12px;
     font-weight: 400;
     line-height: 1.6;
     color: #333;
-    /* Dark gray for readability */
-
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     gap: 1rem;
-    font-size: 0.9rem;
+    font-size: 0.75rem;
 }
 
 header .contact-section p {
@@ -60,9 +66,6 @@ header .contact-section p {
 }
 
 header .contact-section a {
-    font-weight: 700;
-    /* Bold links */
-    text-decoration: none;
     color: #fff;
     text-decoration: none;
 }
@@ -72,16 +75,32 @@ header .contact-section a:hover {
 }
 
 @media print {
+
     header {
-        background: #555;
+        background: none;
+        background-color: midnightblue;
     }
+
     footer {
         display: none;
+    }
+
+    .page-break {
+        page-break-before: always;
+        margin-top: 2in;
+        /* Adjust margin on the new page */
+    }
+
+    /* Example for content that might break to a new page */
+    .content-to-break {
+        page-break-after: always;
     }
 
     .job {
         page-break-inside: avoid;
         margin-bottom: 1rem;
+        /* padding-top: 1rem; */
+        /* Add padding to ensure enough top space */
     }
 
     /* Education items shouldn't break across pages */
@@ -90,38 +109,14 @@ header .contact-section a:hover {
         margin-bottom: 1rem;
     }
 
-    @page {
-        size: Letter;
-        margin: 1in;
+    @page  {
+        size: A4;
+        padding-top: 0.30in;
     }
 
-    body {
-        font-size: 12pt;
+    @page :first {
+        padding-top: 0in;
     }
-}
-
-@keyframes gradient-animation {
-    0% {
-        background-position: 0% 50%;
-    }
-
-    50% {
-        background-position: 100% 50%;
-    }
-
-    100% {
-        background-position: 0% 50%;
-    }
-}
-
-header h1 {
-    font-size: 2.5rem;
-    margin-bottom: 0.5rem;
-}
-
-header p {
-    font-size: 1rem;
-    margin-bottom: 1rem;
 }
 
 /* Main Sections */
@@ -130,11 +125,11 @@ main {
 }
 
 h2 {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     /* Reduced font size */
-    color: #000c64;
+    color: rgb(123, 123, 123);
     /* Neutral tone */
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.25rem;
 }
 
 section {
@@ -143,9 +138,6 @@ section {
 
 #about p {
     font-size: 0.9rem;
-    /* Reduced font size */
-    color: #666;
-    /* Softer tone */
 }
 
 /* Skills Section */
@@ -156,7 +148,7 @@ section {
 }
 
 .skill {
-    background: #555;
+    background-color: #51585e;
     /* Muted Gray */
     color: #fff;
     padding: 0.4rem 0.8rem;
@@ -171,13 +163,14 @@ section {
 }
 
 .job h3 {
-    font-size: 1.2rem;
+    color: #495057;
+    font-size: 1rem;
     /* Reduced font size */
     margin-bottom: 0.2rem;
 }
 
 .job h4 {
-    color: #555;
+    color: #51585e;
     font-style: italic;
 }
 
@@ -197,7 +190,7 @@ section {
 
 /* Footer */
 footer {
-    background: linear-gradient(135deg, #e17735, #13259f);
+    background: midnightblue;
     color: #fff;
     text-align: center;
     padding: 0.8rem 0;
@@ -212,6 +205,12 @@ footer p {
 #education {
     margin-bottom: 1.5rem;
 }
+
+/* .education-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+} */
 
 .education-item {
     margin-bottom: 1rem;
