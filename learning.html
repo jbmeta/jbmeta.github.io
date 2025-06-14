@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>From Code to Cognition: An Interactive Learning Plan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Focus -->
+    <!-- Application Structure Plan: The application is designed as a single-page, vertical roadmap. This structure was chosen because the source report outlines a linear, sequential learning journey. A single-page app maintains this sense of progression. To prevent overwhelming the user, the content is broken into five distinct phase sections. A sticky top navigation bar allows for quick jumps between these phases. The key innovation is the use of an interactive timeline chart at the top to provide a high-level overview and collapsible "accordion" sections within each phase to manage information density. This allows the user to see the big picture and then progressively disclose details as needed, which is ideal for a dense, text-heavy report. The user flow is: 1) See the overview/timeline. 2) Select a phase (via nav or chart). 3) Explore concepts and projects within that phase by expanding relevant sections. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: Phase timelines (Section 1.3). Goal: Change/Overview. Viz: Horizontal Bar Chart (Chart.js). Interaction: Hover for details, click to navigate. Justification: Visually represents the duration and sequence of the learning plan, making it more intuitive than a table.
+        - Report Info: Detailed content within each phase (Sections 2-6). Goal: Organize/Inform. Presentation: Collapsible accordion sections (HTML/JS). Interaction: Click to expand/collapse. Justification: Manages high information density, allowing users to focus on one topic at a time without excessive scrolling.
+        - Report Info: Curated resource links. Goal: Inform/Action. Presentation: Styled cards with titles and links. Interaction: Click to navigate to external resource. Justification: Provides clear, actionable links with context, superior to a raw list of URLs.
+        - Report Info: Project descriptions. Goal: Apply/Inform. Presentation: Dedicated project cards with clear objectives, steps, and outcomes. Justification: Highlights the practical, project-based nature of the learning plan, which is crucial for the target audience of engineers.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* slate-50 */
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 250px;
+            max-height: 300px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 300px;
+                max-height: 350px;
+            }
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out;
+        }
+        .accordion-content.open {
+            max-height: 2000px; /* Adjust as needed */
+        }
+        .link-card {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .link-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+    </style>
+</head>
+<body class="text-slate-700">
+
+    <!-- Header & Navigation -->
+    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex-shrink-0">
+                    <h1 class="text-xl font-bold text-slate-800">AI/ML Roadmap</h1>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#overview" class="text-slate-600 hover:bg-slate-200 hover:text-slate-900 px-3 py-2 rounded-md text-sm font-medium">Overview</a>
+                        <a href="#phase1" class="text-slate-600 hover:bg-slate-200 hover:text-slate-900 px-3 py-2 rounded-md text-sm font-medium">Phase I</a>
+                        <a href="#phase2" class="text-slate-600 hover:bg-slate-200 hover:text-slate-900 px-3 py-2 rounded-md text-sm font-medium">Phase II</a>
+                        <a href="#phase3" class="text-slate-600 hover:bg-slate-200 hover:text-slate-900 px-3 py-2 rounded-md text-sm font-medium">Phase III</a>
+                        <a href="#phase4" class="text-slate-600 hover:bg-slate-200 hover:text-slate-900 px-3 py-2 rounded-md text-sm font-medium">Phase IV</a>
+                        <a href="#phase5" class="text-slate-600 hover:bg-slate-200 hover:text-slate-900 px-3 py-2 rounded-md text-sm font-medium">Phase V</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+
+        <!-- Section 1: Overview -->
+        <section id="overview" class="mb-16 scroll-mt-20">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-slate-900 tracking-tight">From Code to Cognition</h2>
+                <p class="mt-4 max-w-3xl mx-auto text-lg text-slate-600">An interactive learning plan for software engineers transitioning to Machine Learning and Robotics. This roadmap is designed as a spiral of theory and practice, ensuring you build intuitive understanding alongside practical skills.</p>
+            </div>
+            
+            <div class="bg-white p-6 rounded-2xl shadow-lg">
+                <h3 class="text-xl font-semibold text-slate-800 mb-2 text-center">Curriculum Timeline Overview</h3>
+                <p class="text-center text-slate-500 mb-6">This chart visualizes the estimated duration for each phase. Click on a bar to jump to that phase's details.</p>
+                <div class="chart-container">
+                    <canvas id="timelineChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dynamic Phase Sections will be rendered here -->
+        <div id="phasesContainer" class="space-y-12"></div>
+
+    </main>
+
+    <footer class="bg-slate-100 mt-16">
+        <div class="container mx-auto py-6 px-4 sm:px-6 lg:px-8 text-center text-slate-500">
+            <p>&copy; 2025 AI/ML Learning Roadmap. This interactive plan is based on the report "From Code to Cognition".</p>
+        </div>
+    </footer>
+
+<script>
+    const phasesData = [
+        {
+            id: 'phase1',
+            title: 'Phase I: The Mathematical and Computational Bedrock',
+            timeline: '2-3 Months',
+            description: 'This foundational phase is the most critical part of the transition. The goal is to achieve fluency in the mathematical language and computational tools used to define, optimize, and evaluate machine learning models.',
+            bgColor: 'bg-sky-50',
+            borderColor: 'border-sky-200',
+            accentColor: 'text-sky-800',
+            content: `
+                <div class="space-y-4">
+                    <div class="accordion-item bg-white rounded-lg shadow-sm">
+                        <button class="accordion-header w-full flex justify-between items-center p-4 text-left font-semibold">
+                            <span>🧠 Core Concepts: The Language of Data & Optimization</span>
+                            <span class="accordion-icon transition-transform transform">▸</span>
+                        </button>
+                        <div class="accordion-content">
+                            <div class="p-4 border-t border-slate-200 grid md:grid-cols-3 gap-4">
+                                <div class="p-4 border rounded-lg">
+                                    <h4 class="font-bold mb-2">Linear Algebra</h4>
+                                    <p class="text-sm mb-3">The grammar of data. Understand vectors, matrices, and transformations.</p>
+                                    <a href="https://www.youtube.com/playlist?list=PLZHQObOWTQDPD3MizzM2xVFitgF8hE_ab" target="_blank" class="link-card block bg-sky-100 text-sky-800 p-3 rounded-md text-sm font-medium">3Blue1Brown (Intuition)</a>
+                                    <a href="https://www.khanacademy.org/math/linear-algebra" target="_blank" class="link-card block bg-sky-100 text-sky-800 p-3 rounded-md text-sm font-medium mt-2">Khan Academy (Practice)</a>
+                                </div>
+                                <div class="p-4 border rounded-lg">
+                                    <h4 class="font-bold mb-2">Calculus</h4>
+                                    <p class="text-sm mb-3">The engine of model optimization. Grasp derivatives, gradients, and the chain rule.</p>
+                                    <a href="https://www.youtube.com/playlist?list=PLZHQObOWTQDMsr9K-rj53DwVRMYO3t5Yr" target="_blank" class="link-card block bg-sky-100 text-sky-800 p-3 rounded-md text-sm font-medium">3Blue1Brown (Intuition)</a>
+                                    <a href="https://www.coursera.org/learn/machine-learning-calculus" target="_blank" class="link-card block bg-sky-100 text-sky-800 p-3 rounded-md text-sm font-medium mt-2">Coursera (ML Focus)</a>
+                                </div>
+                                <div class="p-4 border rounded-lg">
+                                    <h4 class="font-bold mb-2">Probability & Statistics</h4>
+                                    <p class="text-sm mb-3">The science of uncertainty. Learn distributions, Bayes' theorem, and hypothesis testing.</p>
+                                    <a href="https://www.khanacademy.org/math/statistics-probability" target="_blank" class="link-card block bg-sky-100 text-sky-800 p-3 rounded-md text-sm font-medium">Khan Academy (Foundation)</a>
+                                    <a href="https://ocw.mit.edu/courses/18-05-introduction-to-probability-and-statistics-spring-2014/" target="_blank" class="link-card block bg-sky-100 text-sky-800 p-3 rounded-md text-sm font-medium mt-2">MIT OCW (Rigor)</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item bg-white rounded-lg shadow-sm">
+                        <button class="accordion-header w-full flex justify-between items-center p-4 text-left font-semibold">
+                            <span>🛠️ Key Skills & Frameworks: The Python ML Stack</span>
+                             <span class="accordion-icon transition-transform transform">▸</span>
+                        </button>
+                        <div class="accordion-content">
+                            <ul class="p-4 border-t border-slate-200 list-disc list-inside space-y-2">
+                                <li><strong>Python, NumPy, Pandas:</strong> The holy trinity for data manipulation and numerical computation.</li>
+                                <li><strong>Matplotlib & Seaborn:</strong> Essential libraries for data visualization and exploration.</li>
+                                <li><strong>Jupyter Notebooks & Google Colab:</strong> Your interactive development environment. Colab is key for free GPU access later.</li>
+                            </ul>
+                        </div>
+                    </div>
+                     <div class="bg-white rounded-lg shadow-sm p-4">
+                        <h4 class="font-semibold text-lg mb-2">🏆 Milestone Project</h4>
+                        <div class="bg-amber-50 border border-amber-200 p-4 rounded-lg">
+                            <h5 class="font-bold">Exploratory Data Analysis (EDA) of the Iris Dataset</h5>
+                            <p class="text-sm mt-1">Use Pandas, Matplotlib, and Seaborn to load, inspect, clean, and visualize the classic Iris dataset. The goal is to tell a story with data and uncover patterns that will motivate the classification algorithms in Phase II.</p>
+                        </div>
+                    </div>
+                </div>`
+        },
+        {
+            id: 'phase2',
+            title: 'Phase II: Mastering Core Machine Learning',
+            timeline: '3-4 Months',
+            description: 'Dive into the core algorithms of "classical" ML. Develop a deep understanding of how different algorithms work, their assumptions, and how to choose the right one for a given problem.',
+            bgColor: 'bg-violet-50',
+            borderColor: 'border-violet-200',
+            accentColor: 'text-violet-800',
+            content: `
+                <div class="space-y-4">
+                    <div class="accordion-item bg-white rounded-lg shadow-sm">
+                        <button class="accordion-header w-full flex justify-between items-center p-4 text-left font-semibold">
+                            <span>🧠 Core Concepts: Supervised & Unsupervised Learning</span>
+                            <span class="accordion-icon transition-transform transform">▸</span>
+                        </button>
+                        <div class="accordion-content">
+                            <div class="p-4 border-t border-slate-200 space-y-3">
+                                <p><strong>Supervised Learning:</strong> Learn from labeled data. Master Linear/Logistic Regression, SVMs, k-NN, and Decision Trees/Random Forests.</p>
+                                <p><strong>Unsupervised Learning:</strong> Find hidden patterns in unlabeled data. Learn K-Means Clustering and PCA for dimensionality reduction.</p>
+                                <p><strong>Validation:</strong> Understand the Bias-Variance Tradeoff, Cross-Validation, Regularization, and essential evaluation metrics (Precision, Recall, F1-score, MSE).</p>
+                                <a href="https://www.coursera.org/specializations/machine-learning-introduction" target="_blank" class="link-card inline-block bg-violet-100 text-violet-800 p-3 rounded-md text-sm font-medium">Primary Resource: Andrew Ng's ML Specialization</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item bg-white rounded-lg shadow-sm">
+                        <button class="accordion-header w-full flex justify-between items-center p-4 text-left font-semibold">
+                            <span>🛠️ Key Skills & Frameworks</span>
+                             <span class="accordion-icon transition-transform transform">▸</span>
+                        </button>
+                        <div class="accordion-content">
+                            <ul class="p-4 border-t border-slate-200 list-disc list-inside space-y-2">
+                                <li><strong>Scikit-learn:</strong> The workhorse library for classical ML in Python. Master its consistent API for training, testing, and evaluating models.</li>
+                                <li><strong>Model Evaluation:</strong> Go beyond accuracy. Implement confusion matrices, precision-recall curves, and R-squared metrics.</li>
+                            </ul>
+                        </div>
+                    </div>
+                     <div class="bg-white rounded-lg shadow-sm p-4">
+                        <h4 class="font-semibold text-lg mb-2">🏆 Milestone Project Suite</h4>
+                        <div class="grid md:grid-cols-3 gap-4">
+                            <div class="bg-amber-50 border border-amber-200 p-4 rounded-lg">
+                                <h5 class="font-bold">Iris Classification</h5>
+                                <p class="text-sm mt-1">Apply multiple classifiers (Logistic Regression, k-NN, SVM) to the Iris dataset and evaluate their performance.</p>
+                            </div>
+                             <div class="bg-amber-50 border border-amber-200 p-4 rounded-lg">
+                                <h5 class="font-bold">Titanic Survival Prediction</h5>
+                                <p class="text-sm mt-1">Tackle a messy, real-world dataset. Focus on data cleaning and feature engineering to predict passenger survival.</p>
+                            </div>
+                             <div class="bg-amber-50 border border-amber-200 p-4 rounded-lg">
+                                <h5 class="font-bold">Boston Housing Prices</h5>
+                                <p class="text-sm mt-1">Build a regression model. Practice feature scaling, model comparison (Linear Regression vs. Random Forest), and hyperparameter tuning.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>`
+        },
+        {
+            id: 'phase3',
+            title: 'Phase III: Ascending to Deep Learning',
+            timeline: '3-4 Months',
+            description: 'Transition to deep learning, the subfield responsible for today\'s most significant AI breakthroughs. Learn to build and train neural networks for complex, unstructured data like images and text.',
+            bgColor: 'bg-emerald-50',
+            borderColor: 'border-emerald-200',
+            accentColor: 'text-emerald-800',
+            content: `
+                <div class="space-y-4">
+                    <div class="accordion-item bg-white rounded-lg shadow-sm">
+                        <button class="accordion-header w-full flex justify-between items-center p-4 text-left font-semibold">
+                            <span>🧠 Core Concepts: Neural Networks & Architectures</span>
+                            <span class="accordion-icon transition-transform transform">▸</span>
+                        </button>
+                        <div class="accordion-content">
+                            <div class="p-4 border-t border-slate-200 space-y-3">
+                                <p><strong>Foundations:</strong> Understand the neuron, activation functions (ReLU), forward/backpropagation, loss functions, and optimizers (Adam).</p>
+                                <p><strong>Convolutional Neural Networks (CNNs):</strong> The gold standard for computer vision. Learn how convolutional and pooling layers detect features in images.</p>
+                                <p><strong>Sequence Models (RNNs/LSTMs):</strong> Architectures designed for sequential data like text, using hidden states to maintain context.</p>
+                                <a href="https://www.coursera.org/specializations/deep-learning" target="_blank" class="link-card inline-block bg-emerald-100 text-emerald-800 p-3 rounded-md text-sm font-medium">Primary Resource: Andrew Ng's Deep Learning Specialization</a>
+                                <a href="https://course.fast.ai/" target="_blank" class="link-card inline-block bg-emerald-100 text-emerald-800 p-3 rounded-md text-sm font-medium ml-2">Practical Complement: fast.ai</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item bg-white rounded-lg shadow-sm">
+                        <button class="accordion-header w-full flex justify-between items-center p-4 text-left font-semibold">
+                            <span>🛠️ Key Skills & Frameworks</span>
+                             <span class="accordion-icon transition-transform transform">▸</span>
+                        </button>
+                        <div class="accordion-content">
+                           <ul class="p-4 border-t border-slate-200 list-disc list-inside space-y-2">
+                                <li><strong>TensorFlow & Keras:</strong> Master Google's powerful, production-ready deep learning framework through the user-friendly Keras API.</li>
+                                <li><strong>PyTorch:</strong> Become familiar with Meta's flexible, researcher-favored framework.</li>
+                                <li><strong>GPU Utilization:</strong> Get comfortable using Google Colab to accelerate model training on free GPUs.</li>
+                            </ul>
+                        </div>
+                    </div>
+                     <div class="bg-white rounded-lg shadow-sm p-4">
+                        <h4 class="font-semibold text-lg mb-2">🏆 Milestone Project Suite (on Google Colab)</h4>
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div class="bg-amber-50 border border-amber-200 p-4 rounded-lg">
+                                <h5 class="font-bold">MNIST Digit Recognition</h5>
+                                <p class="text-sm mt-1">The "Hello, World!" of deep learning. Build a simple CNN to classify handwritten digits.</p>
+                            </div>
+                             <div class="bg-amber-50 border border-amber-200 p-4 rounded-lg">
+                                <h5 class="font-bold">Cat vs. Dog Image Classification</h5>
+                                <p class="text-sm mt-1">Tackle a harder problem using data augmentation and transfer learning with a pre-trained model like VGG16.</p>
+                            </div>
+                             <div class="bg-amber-50 border border-amber-200 p-4 rounded-lg">
+                                <h5 class="font-bold">IMDB Sentiment Analysis (Stretch)</h5>
+                                <p class="text-sm mt-1">An introduction to NLP. Build a sequence model (LSTM) to classify movie reviews as positive or negative.</p>
+                            </div>
+                             <div class="bg-amber-50 border border-amber-200 p-4 rounded-lg">
+                                <h5 class="font-bold">Movie Recommender (Stretch)</h5>
+                                <p class="text-sm mt-1">Build a collaborative filtering model using embeddings to recommend movies.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>`
+        },
+        {
+            id: 'phase4',
+            title: 'Phase IV: The Robotics Frontier',
+            timeline: '4-6+ Months',
+            description: 'Integrate your ML knowledge into the dynamic world of robotics. This is a systems integration challenge involving real-time communication between hardware and software.',
+            bgColor: 'bg-rose-50',
+            borderColor: 'border-rose-200',
+            accentColor: 'text-rose-800',
+            content: `
+                <div class="space-y-4">
+                    <div class="accordion-item bg-white rounded-lg shadow-sm">
+                        <button class="accordion-header w-full flex justify-between items-center p-4 text-left font-semibold">
+                            <span>🧠 Core Concepts: Embodied AI</span>
+                            <span class="accordion-icon transition-transform transform">▸</span>
+                        </button>
+                        <div class="accordion-content">
+                            <div class="p-4 border-t border-slate-200 space-y-3">
+                                <p><strong>ROS 2:</strong> Learn the Robot Operating System, the standard middleware for robotics. Understand nodes, topics, services, and launch files.</p>
+                                <p><strong>Simulation:</strong> Master Gazebo or CoppeliaSim to test code safely before deploying on physical hardware.</p>
+                                <p><strong>Computer Vision for Robotics:</strong> Apply object detection and pose estimation in real-time using OpenCV integrated with ROS.</p>
+                                <p><strong>Reinforcement Learning (RL):</strong> Teach agents to act by maximizing rewards. Understand MDPs, Q-Learning, and the "sim-to-real" challenge.</p>
+                                <p><strong>SLAM:</strong> Understand the concept of Simultaneous Localization and Mapping, a cornerstone problem in mobile robotics.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item bg-white rounded-lg shadow-sm">
+                        <button class="accordion-header w-full flex justify-between items-center p-4 text-left font-semibold">
+                            <span>🛠️ Key Skills & Frameworks</span>
+                             <span class="accordion-icon transition-transform transform">▸</span>
+                        </button>
+                        <div class="accordion-content">
+                            <ul class="p-4 border-t border-slate-200 list-disc list-inside space-y-2">
+                                <li><strong>ROS 2 (Humble/Jazzy):</strong> The de facto standard for robot application development.</li>
+                                <li><strong>Gazebo:</strong> High-fidelity 3D physics simulator.</li>
+                                <li><strong>OpenCV:</strong> The premier library for real-time computer vision.</li>
+                                <li><strong>OpenAI Gym / Gymnasium:</strong> The standard toolkit for developing and comparing reinforcement learning algorithms.</li>
+                            </ul>
+                        </div>
+                    </div>
+                     <div class="bg-white rounded-lg shadow-sm p-4">
+                        <h4 class="font-semibold text-lg mb-2">🏆 Milestone Project</h4>
+                        <div class="bg-amber-50 border border-amber-200 p-4 rounded-lg">
+                            <h5 class="font-bold">Vision-Based Navigation in Simulation</h5>
+                            <p class="text-sm mt-1">Create a mobile robot in Gazebo that uses a camera and an OpenCV-based perception node to detect a colored object and navigate towards it. This project covers the full "perception-planning-action" loop.</p>
+                        </div>
+                    </div>
+                </div>`
+        },
+        {
+            id: 'phase5',
+            title: 'Phase V: The Lifelong Practitioner',
+            timeline: 'Ongoing',
+            description: 'The field evolves at a blistering pace. This final, ongoing phase is about developing the skills and habits to stay current, contribute, and continue learning effectively.',
+            bgColor: 'bg-gray-50',
+            borderColor: 'border-gray-200',
+            accentColor: 'text-gray-800',
+            content: `
+                 <div class="space-y-4">
+                    <div class="accordion-item bg-white rounded-lg shadow-sm">
+                        <button class="accordion-header w-full flex justify-between items-center p-4 text-left font-semibold">
+                            <span>🧠 Core Concepts: Staying at the Vanguard</span>
+                            <span class="accordion-icon transition-transform transform">▸</span>
+                        </button>
+                        <div class="accordion-content">
+                            <div class="p-4 border-t border-slate-200 space-y-3">
+                                <p><strong>Project-Driven Learning:</strong> Shift from consumption to creation. Build personal projects, participate in Kaggle competitions, and contribute to open source.</p>
+                                <p><strong>Reading Research:</strong> Learn to read and understand research papers from arXiv and top conferences like NeurIPS, ICML, and CVPR.</p>
+                                <p><strong>Curating Your Info Diet:</strong> Follow key blogs (OpenAI, Google AI), newsletters (The Batch, TLDR AI), and channels (Two Minute Papers, Lex Fridman).</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item bg-white rounded-lg shadow-sm">
+                        <button class="accordion-header w-full flex justify-between items-center p-4 text-left font-semibold">
+                            <span>🛠️ Key Resources</span>
+                             <span class="accordion-icon transition-transform transform">▸</span>
+                        </button>
+                        <div class="accordion-content">
+                            <div class="p-4 border-t border-slate-200 grid md:grid-cols-3 gap-4">
+                                <a href="https://arxiv.org/corr/home" target="_blank" class="link-card block bg-gray-100 text-gray-800 p-3 rounded-md text-sm font-medium">arXiv.org</a>
+                                <a href="https://paperswithcode.com/" target="_blank" class="link-card block bg-gray-100 text-gray-800 p-3 rounded-md text-sm font-medium">Papers with Code</a>
+                                <a href="https://www.kaggle.com/" target="_blank" class="link-card block bg-gray-100 text-gray-800 p-3 rounded-md text-sm font-medium">Kaggle</a>
+                                <a href="https://tldr.tech/ai" target="_blank" class="link-card block bg-gray-100 text-gray-800 p-3 rounded-md text-sm font-medium">TLDR AI Newsletter</a>
+                                <a href="https://www.youtube.com/@TwoMinutePapers" target="_blank" class="link-card block bg-gray-100 text-gray-800 p-3 rounded-md text-sm font-medium">Two Minute Papers</a>
+                                <a href="https://www.deeplearning.ai/the-batch/" target="_blank" class="link-card block bg-gray-100 text-gray-800 p-3 rounded-md text-sm font-medium">The Batch Newsletter</a>
+                            </div>
+                        </div>
+                    </div>
+                     <div class="bg-white rounded-lg shadow-sm p-4">
+                        <h4 class="font-semibold text-lg mb-2">🏆 Your Next Project</h4>
+                        <div class="bg-amber-50 border border-amber-200 p-4 rounded-lg">
+                            <h5 class="font-bold">Self-Defined Capstone Project</h5>
+                            <p class="text-sm mt-1">Apply your accumulated knowledge to a problem that genuinely interests you. This is where true mastery begins. Your journey as a creator starts now.</p>
+                        </div>
+                    </div>
+                </div>`
+        }
+    ];
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const phasesContainer = document.getElementById('phasesContainer');
+        phasesData.forEach(phase => {
+            const section = document.createElement('section');
+            section.id = phase.id;
+            section.className = 'scroll-mt-20';
+            section.innerHTML = `
+                <div class="bg-white p-6 md:p-8 rounded-2xl shadow-lg border-t-4 ${phase.borderColor}">
+                    <h3 class="text-2xl font-bold ${phase.accentColor} tracking-tight">${phase.title}</h3>
+                    <p class="text-slate-500 font-medium mt-1 mb-4">Est. Timeline: ${phase.timeline}</p>
+                    <p class="mb-6">${phase.description}</p>
+                    ${phase.content}
+                </div>
+            `;
+            phasesContainer.appendChild(section);
+        });
+
+        // Accordion Logic
+        const accordionHeaders = document.querySelectorAll('.accordion-header');
+        accordionHeaders.forEach(header => {
+            header.addEventListener('click', () => {
+                const content = header.nextElementSibling;
+                const icon = header.querySelector('.accordion-icon');
+                content.classList.toggle('open');
+                icon.classList.toggle('rotate-90');
+            });
+        });
+
+        // Chart.js Timeline
+        const ctx = document.getElementById('timelineChart').getContext('2d');
+        const timelineChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: phasesData.map(p => p.title.split(':')[0]),
+                datasets: [{
+                    label: 'Min Months',
+                    data: [2, 3, 3, 4, 0], 
+                    backgroundColor: 'rgba(56, 189, 248, 0.6)', // sky-400
+                    borderColor: 'rgba(14, 165, 233, 1)', // sky-500
+                    borderWidth: 1,
+                    stack: 'timeline'
+                }, {
+                    label: 'Max Months',
+                    data: [1, 1, 1, 2, 0],
+                    backgroundColor: 'rgba(12, 74, 110, 0.6)', // sky-800
+                    borderColor: 'rgba(3, 7, 18, 1)', // sky-950
+                    borderWidth: 1,
+                    stack: 'timeline'
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `Est. Timeline: ${phasesData[context.dataIndex].timeline}`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        stacked: true,
+                        title: {
+                            display: true,
+                            text: 'Estimated Months'
+                        }
+                    },
+                    y: {
+                        stacked: true,
+                        ticks: {
+                            autoSkip: false,
+                             callback: function(value, index, values) {
+                                const label = this.getLabelForValue(value);
+                                return label.length > 8 ? label.substring(0, 8) + '...' : label;
+                            }
+                        }
+                    }
+                },
+                onClick: (event, elements) => {
+                    if (elements.length > 0) {
+                        const index = elements[0].index;
+                        const phaseId = phasesData[index].id;
+                        document.getElementById(phaseId).scrollIntoView({ behavior: 'smooth' });
+                    }
+                }
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
