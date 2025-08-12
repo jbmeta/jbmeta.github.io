@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Digital Dice — Shake or Click</title>
+  <style>
+    :root {
+      --bg: #0f1226;
+      --card: #111634;
+      --accent: #5ee1a2;
+      --pip: #1b2047;
+      --pip-on: #ffffff;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      height: 100%;
+      margin: 0;
+      background: radial-gradient(1200px 800px at 50% 0%, #1a1f4a, var(--bg));
+      color: #e7e9ff;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+    }
+    .wrap {
+      min-height: 100%;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+    .app {
+      display: grid;
+      gap: 20px;
+      justify-items: center;
+      text-align: center;
+      width: min(560px, 92vw);
+    }
+    h1 { font-size: 22px; margin: 0; font-weight: 700; letter-spacing: 0.2px; }
+    .desk {
+      background: linear-gradient(145deg, #0c1030, var(--card));
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 18px;
+      padding: 24px;
+      box-shadow:
+        0 20px 60px rgba(0,0,0,0.35),
+        inset 0 1px 0 rgba(255,255,255,0.05);
+      display: grid;
+      gap: 18px;
+      justify-items: center;
+    }
+    /* Die */
+    .die {
+      width: min(220px, 62vw);
+      aspect-ratio: 1/1;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow:
+        inset 0 2px 0 #fff,
+        0 10px 30px rgba(0,0,0,0.25);
+      display: grid;
+      place-items: center;
+      position: relative;
+      transform: translateZ(0);
+    }
+    .pips {
+      width: 76%;
+      height: 76%;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      gap: 10%;
+    }
+    .pip {
+      background: var(--pip);
+      border-radius: 50%;
+      opacity: 0.18;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.35);
+      transition: opacity 140ms ease, background 140ms ease, transform 140ms ease;
+      transform: scale(0.9);
+    }
+    .pip.on {
+      background: var(--pip-on);
+      opacity: 1;
+      transform: scale(1);
+    }
+    .die.rolling {
+      animation: shake 620ms cubic-bezier(.36,.07,.19,.97);
+    }
+    @keyframes shake {
+      10%, 90% { transform: translate3d(-1px, 0, 0) rotate(-0.5deg); }
+      20%, 80% { transform: translate3d(2px, 0, 0) rotate(0.5deg); }
+      30%, 50%, 70% { transform: translate3d(-3px, 0, 0) rotate(-1deg); }
+      40%, 60% { transform: translate3d(3px, 0, 0) rotate(1deg); }
+    }
+    /* Controls */
+    .controls {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    button {
+      -webkit-tap-highlight-color: transparent;
+      appearance: none;
+      background: linear-gradient(180deg, #6bf0b0, var(--accent));
+      color: #0c132c;
+      border: none;
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      cursor: pointer;
+      box-shadow: 0 10px 24px rgba(94,225,162,0.35);
+      transition: transform 120ms ease, filter 120ms ease, box-shadow 120ms ease;
+    }
+    button.secondary {
+      background: transparent;
+      color: #d6d9ff;
+      border: 1px solid rgba(255,255,255,0.16);
+      box-shadow: none;
+    }
+    button:active { transform: translateY(1px); }
+    .status {
+      font-size: 14px;
+      color: #b4b8ff;
+      opacity: 0.9;
+    }
+    .result {
+      font-size: 48px;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: 0.5px;
+      margin-top: 2px;
+      text-shadow: 0 6px 18px rgba(0,0,0,0.25);
+    }
+    .hint {
+      font-size: 12px;
+      color: #9aa0ff;
+      opacity: 0.9;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="app">
+      <h1>Digital Dice — shake phone or click roll</h1>
+
+      <div class="desk">
+        <div id="die" class="die" aria-label="Dice">
+          <div class="pips">
+            <div class="pip" data-pos="1"></div>
+            <div class="pip" data-pos="2"></div>
+            <div class="pip" data-pos="3"></div>
+            <div class="pip" data-pos="4"></div>
+            <div class="pip" data-pos="5"></div>
+            <div class="pip" data-pos="6"></div>
+            <div class="pip" data-pos="7"></div>
+            <div class="pip" data-pos="8"></div>
+            <div class="pip" data-pos="9"></div>
+          </div>
+        </div>
+
+        <div class="result" id="result">Roll me</div>
+        <div class="status" id="status">Click Roll or shake your phone.</div>
+
+        <div class="controls">
+          <button id="rollBtn">Roll</button>
+          <button id="enableMotionBtn" class="secondary" style="display:none;">Enable motion</button>
+        </div>
+
+        <div class="hint" id="hint">Tip: On iOS Safari you may need to tap “Enable motion”.</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ------- Dice rendering -------
+    const dieEl = document.getElementById('die');
+    const pips = Array.from(dieEl.querySelectorAll('.pip'));
+    const resultEl = document.getElementById('result');
+    const statusEl = document.getElementById('status');
+    const rollBtn = document.getElementById('rollBtn');
+    const enableBtn = document.getElementById('enableMotionBtn');
+
+    const faces = {
+      1: [5],
+      2: [1, 9],
+      3: [1, 5, 9],
+      4: [1, 3, 7, 9],
+      5: [1, 3, 5, 7, 9],
+      6: [1, 3, 4, 6, 7, 9],
+    };
+
+    function setFace(n) {
+      pips.forEach(p => p.classList.remove('on'));
+      (faces[n] || []).forEach(pos => {
+        const pip = pips.find(p => +p.dataset.pos === pos);
+        if (pip) pip.classList.add('on');
+      });
+      resultEl.textContent = `You rolled ${n}`;
+    }
+
+    function animateRoll() {
+      dieEl.classList.remove('rolling');
+      // Force reflow to restart animation
+      void dieEl.offsetWidth;
+      dieEl.classList.add('rolling');
+    }
+
+    function haptic() {
+      if (navigator.vibrate) {
+        navigator.vibrate([20, 40, 20]);
+      }
+    }
+
+    function rollDie() {
+      animateRoll();
+      const n = Math.floor(Math.random() * 6) + 1;
+      // Slight delay so animation begins before face snaps
+      setTimeout(() => setFace(n), 160);
+      haptic();
+    }
+
+    // Initial face
+    setFace(1);
+
+    // ------- Button roll -------
+    rollBtn.addEventListener('click', rollDie);
+
+    // ------- Shake detection -------
+    let lastShake = 0;
+    const SHAKE_THRESHOLD = 18; // try 15–22 depending on device
+    const SHAKE_DEBOUNCE_MS = 900;
+
+    function onDeviceMotion(event) {
+      const a = event.accelerationIncludingGravity || event.acceleration;
+      if (!a) return;
+      const x = a.x || 0, y = a.y || 0, z = a.z || 0;
+      const mag = Math.sqrt(x*x + y*y + z*z);
+      const now = Date.now();
+      if (mag > SHAKE_THRESHOLD && (now - lastShake) > SHAKE_DEBOUNCE_MS) {
+        lastShake = now;
+        rollDie();
+      }
+    }
+
+    function tryAttachMotionListener() {
+      window.addEventListener('devicemotion', onDeviceMotion, { passive: true });
+      statusEl.textContent = 'Shake your phone or click Roll.';
+    }
+
+    // iOS 13+ requires user permission for motion sensors
+    function setupMotionPermissionFlow() {
+      const needsPermission =
+        typeof DeviceMotionEvent !== 'undefined' &&
+        typeof DeviceMotionEvent.requestPermission === 'function';
+
+      if (needsPermission) {
+        enableBtn.style.display = 'inline-block';
+        statusEl.textContent = 'Tap Enable motion, then shake to roll.';
+        enableBtn.addEventListener('click', async () => {
+          try {
+            const res = await DeviceMotionEvent.requestPermission();
+            if (res === 'granted') {
+              tryAttachMotionListener();
+              enableBtn.style.display = 'none';
+              statusEl.textContent = 'Motion enabled. Shake to roll!';
+            } else {
+              statusEl.textContent = 'Motion denied. Use the Roll button.';
+            }
+          } catch (e) {
+            statusEl.textContent = 'Could not enable motion. Use the Roll button.';
+          }
+        });
+      } else {
+        // Non-iOS or older devices: try to attach directly
+        tryAttachMotionListener();
+      }
+    }
+
+    // Some browsers require secure context (https) for motion; still set up UI
+    setupMotionPermissionFlow();
+
+    // ------- Optional: Prevent screen from dimming on interaction (mobile) -------
+    // Add a small user interaction to keep screen alive if desired.
+  </script>
+</body>
+</html>
