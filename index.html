@@ -12,9 +12,14 @@
 
 <body>
     <header>
-        <div class="name-section">
+        <div class="name-section" style="cursor: pointer;">
             <h1>Jay Mehta</h1>
-            <p>Senior Software Engineer | Technology Enthusiast</p>
+            <p id="subtitle-container">
+                <span class="subtitle">Senior Software Engineer | Product Focused Engineer & Innovator</span>
+                <span class="subtitle hidden">Senior Software Engineer | Full Stack & Cloud Architecture</span>
+                <span class="subtitle hidden">Senior Software Engineer | Scalable Systems & Web Applications</span>
+                <span class="subtitle hidden">Senior Software Engineer | Engineering & Product Leadership</span>
+            </p>
         </div>
         <div class="contact-section">
             <p><a href="mailto:jaymehta.email@gmail.com">📧jaymehta.email@gmail.com</a></p>
@@ -26,142 +31,146 @@
         <div class="neon-line"></div>
     </header>
     <main>
-        <section id="about">
-            <h2>About Me</h2>
-            <p>
-                Driven by a deep passion for engineering, innovation, and problem-solving, with a focus on driving
-                product development and delivering solutions. I have a proven track record of building scalable and high
-                performance software systems. I am a technology enthusiast with a strong foundation in computer science
-                and software engineering coupled with 7+ years of professional experience. I am seeking opportunities to
-                tackle meaningful challenges and apply my time and skills to create valuable products and services.
-            </p>
+        <section id="summary" style="cursor: pointer;">
+            <h2>Summary</h2>
+            <div class="summary-content">
+                <p>
+                    Senior Software Engineer with a 8+ year track record of building scalable,
+                    high-performance software from the ground up. Combines deep expertise in distributed systems and
+                    full-stack development with a product-focused, entrepreneurial mindset honed as a startup
+                    co-founder. Passionate about leading teams to solve complex problems, drive technical innovation,
+                    and deliver tangible business value. Seeking a role where I can build meaningful products that make
+                    a difference.
+                </p>
+            </div>
+            <div class="summary-content hidden">
+                <p>
+                    Driven by a deep passion for engineering, innovation, and problem-solving, with a focus on driving
+                    product development and delivering solutions. I have a proven track record of building scalable and
+                    high
+                    performance software systems. I am a technology enthusiast with a strong foundation in computer
+                    science
+                    and software engineering coupled with 8+ years of professional experience. I am seeking
+                    opportunities to
+                    tackle meaningful challenges and apply my time and skills to create valuable products and services.
+                </p>
+            </div>
+            <div class="summary-content hidden">
+                <p>
+                    Senior Software Engineer and former startup co-founder driven by a passion for solving meaningful
+                    problems through technology. With 8+ years of experience, I excel at architecting robust distributed
+                    systems and leading teams to deliver high-quality, full-stack applications. I am seeking an
+                    opportunity to leverage my technical skills and innovative spirit to build valuable products and
+                    contribute to a mission-driven organization.
+                </p>
+            </div>
+            <div class="summary-content hidden">
+                <p> Senior Software Engineer with over 8 years of experience designing and building scalable,
+                    high-performance distributed systems and full-stack applications. Proven track record in leading
+                    engineering initiatives that drive product development, enhance user experience, and optimize
+                    infrastructure costs in fast-paced tech environments. Seeking to leverage my tech expertise to solve
+                    complex challenges.
+                </p>
         </section>
         <section id="skills">
             <h2>Skills</h2>
             <div class="skills-container">
                 <div class="skill">Distributed Systems</div>
                 <div class="skill">Microservices</div>
+                <div class="skill">Leadership</div>
                 <div class="skill">Full Stack</div>
                 <div class="skill">Amazon Web Services (AWS)</div>
                 <div class="skill">Java</div>
-                <div class="skill">Spring</div>
-                <div class="skill">Mobile Apps</div>
-                <div class="skill">Leadership</div>
+                <div class="skill">CI/CD</div>
             </div>
         </section>
         <section id="experience">
             <h2>Experience</h2>
             <div class="job">
                 <h3>Staff Software Engineer @ Visa | May 2024 - Present</h3>
-                <!-- <h4>Visa | May 2024 - Present</h4> -->
                 <ul>
-                    <li>Leading a team building Visa Rule Manager's Account-to-Account Fraud Detection Service to reduce
-                        fraud risks for peer-to-peer transactions</li>
-                    <li>Built a scalable and maintainable user interface platform from the ground up using React,
-                        TypeScript, and Docker, deployed to a Kubernetes environment on AWS EKS with a focus on
-                        modularity and reusable component architecture for other team integrations. Established CI/CD
-                        workflows with GitHub and implemented role-based access control with Cognito</li>
-                    <li>Refactored a legacy Java/Spring-Boot application greatly simplifying codebase specifically with
-                        regards to access control, logging & error handling by implementing Aspect Oriented Programming</li>
+                    <li>Proposed, led, and delivered a cost-optimization initiative for the data ingestion pipeline,
+                        slashing over
+                        $360K in annualized($30K/month) recurring AWS infra cost through architectural improvements &
+                        resource rightsizing.</li>
+                    <li>Championed the adoption of Gen AI tools by establishing team-wide best practices & demonstrating
+                        productivity gains, leading to an estimated 12% increase in development velocity.</li>
+                    <li>Improved codebase maintainability by implementing AOP in a legacy Spring Boot application to
+                        decouple logic for logging and security,
+                        significantly reducing troubleshooting and development time for new endpoints.</li>
+                    </li>
+                    <li>Built a resuable & modular UI platform from ground up with React & TypeScript.
+                        Now used by 3 teams and cutting front-end dev time for new pages/modules by over 35%.
+                    </li>
                 </ul>
             </div>
             <div class="job">
                 <h3>Senior Software Engineer @ PayPal | Oct 2022 - May 2024</h3>
-                <!-- <h4>PayPal | Oct 2022 - May 2024</h4> -->
                 <ul>
-                    <li>Built and maintained software that enables merchants to accept PayPal, Apple Pay, Google Pay and
-                        Meta Checkout on their websites and mobile apps.</li>
-                    <li>Led Package Tracking feature that allows Braintree merchants to send package tracking
-                        information to PayPal. Designed and built the APIs, async workflow linkup with PayPal and added
-                        support for this feature in all 6 Server SDKs.</li>
-                    <li>Delivered merchant onboarding and payment notification workflows for Meta Checkout on Braintree.
+                    <li>Led the development and launch of the Braintree merchant Package Tracking feature, architecting
+                        the APIs
+                        and asynchronous linkup with PayPal, integrating the feature into 6 server-side SDKs, and
+                        successfully
+                        piloting with 30+ merchants processing over 12,000 tracking events monthly.</li>
+                    <li>Engineered the critical merchant onboarding and payment notification workflows for the Braintree
+                        & Meta Checkout integration, enabling seamless
+                        payments for Facebook and Instagram shops and successfully launching with over 50 merchants in
+                        summer of 2023(product has since been sunset).</li>
                     </li>
                 </ul>
             </div>
             <div class="job">
                 <h3>Software Development Engineer 2 @ Flexe | August 2021 - Oct 2022</h3>
-                <!-- <h4>Flexe | August 2021 - Oct 2022</h4> -->
                 <ul>
-                    <li>Full stack development of Flexe's proprietary Warehouse Management System. Worked with Java,
-                        Ruby, Rails, React, Postgres SQL, GCP PubSub, Docker and Kubernetes.</li>
                     <li>Modularized codebase and migrated certain workflows to be event driven instead of
-                        request-response.</li>
-                    <li>Reduced code complexity and improved performance by eliminating stale feature flags. Setup a
-                        process to ensure timely cleanups of all new feature flags.
+                        request-response increasing the system throughput by 30% and improving fault tolerance.</li>
+                    <li>Reduced code complexity and improved performance by eliminating 10+ stale feature flags. Setup a
+                        process via Slack bots to ensure timely cleanups of all new feature flags.
                     </li>
                 </ul>
             </div>
             <div class="job">
                 <h3>Software Development Engineer @ Amazon | April 2019 - August 2021</h3>
-                <!-- <h4>Amazon | April 2019 - August 2021</h4> -->
                 <ul>
-                    <li>Helped prevent counterfeit and verify authenticity in Transparency org. Full stack engineer
-                        primarily
-                        worked with Java, Amazon Web Services (AWS) and React.</li>
-                    <li>Designed & built backend services and RESTful APIs in Java and Docker using Native AWS services
-                        like Fargate, Lambda, Step Function, DynamoDB, S3, API Gateway, EC2, SNS, SQS etc.</li>
-                    <li>Built scalable services to support ingestions of traceability visibility events in multiple
-                        formats and track
-                        job statuses for several asynchronous workflows.
+                    <li>
+                        Helped prevent counterfeit and verify authenticity of products as a full-stack engineer on
+                        Amazon's
+                        Transparency program, primarily focused on backend services, RESTful APIs, and leveraging host
+                        of AWS services(Lambda,
+                        Fargate, DynamoDB, S3, Step Functions, API Gateway, SNS, SQS, CDK, CloudFormation, CloudWatch
+                        etc.).
                     </li>
                     <li>
-                        Periodically did DevOps to raise the bar in engineering & operational excellence. Also improved
-                        full CI/
-                        CD process & quality of deployment pipelines.
+                        Architected and built a high-throughput system to process ingestions of
+                        traceability visibility events in multiple formats and track job statuses for several
+                        asynchronous workflows.
+                        At peak, processing over 2.5 million daily traceability events with 99.99% availability.
                     </li>
-                    <li>
-                        Led consumer facing mobile app development as part of international product launch. Built
-                        Transparency cross-platform mobile app for Android & iOS in React Native and published on Play
-                        Store
-                        and AppStore.
+                    <li>Led the end-to-end development and launch of the cross-platform Transparency mobile app (React
+                        Native) across 8 international markets, including a critical integration into the main Amazon
+                        shopping app.</li>
+                    </li>
+                    <li>Improved engineering excellence by transitioning over 10 legacy services to full CI/CD,
+                        enhancing the quality of deployment pipelines and integrating with LPT Visualizer for better IaC
+                        management.
                     </li>
                 </ul>
             </div>
             <div class="job">
-                <h3>Software Engineer @ Honeywell | May 2018 - Mar 2019</h3>
-                <!-- <h4>Honeywell | May 2018 - Mar 2019</h4> -->
+                <h3>Early Career Experience | Honeywell, SAP Labs, Georgia State University | 2016 - 2019</h3>
                 <ul>
-                    <li>Full-stack development of Honeywell’s Intelligrated Momentum Warehouse Execution System (WES)
-                        with Java-Spring, JavaScript, SQL server and RabbitMQ.</li>
-                    <li>Created end to end APIs and documented with Swagger</li>
-                    <li>Supported customers go-live by performing full system testing on-site with warehouse equipment
-                        like scanners, conveyors, robot shuttles, printers and kiosks</li>
-                </ul>
-            </div>
-            <div class="job">
-                <h3>Software Engineer Intern @ SAP Labs | May 2017 - Mar 2018</h3>
-                <!-- <h4>SAP | May 2017 - Mar 2018</h4> -->
-                <ul>
-                    <li>Developed server-side microservices with Java, Spring boot and Hibernate. HANA, PostgreSQL
-                        as databases and Liquibase for database version control. RESTful APIs are designed in OData v4
-                        standard. Unit and feature testing is performed with JUnit and Cucumber.</li>
-                    <li>Designed front end with SAPUI5, a JavaScript, jQuery, MVC framework like Angular JS. Unit and
-                        integration testing is performed with QUnit and OPA5.</li>
-                </ul>
-            </div>
-            <div class="job">
-                <h3>Graduate Research Assistant @ Georgia State University | Feb 2016- April 2017</h3>
-                <!-- <h4>Georgia State University | Feb 2016- April 2017</h4> -->
-                <ul>
-                    <li>Collaborated with stakeholders to enhance CDC’s EpiInfo software used widely by epidemiologists
-                        and public health researchers in the areas of NoSQL database, platform portability and
-                        performance. Co-authored research paper in the 8th International ACM conference.</li>
-                    <li>Built a prototype form designer utilizing an open-source jQuery library and corresponding data
-                        entry application in Node.js, MongoDB.</li>
+                    <li>Gained foundational experience through roles as a Software Engineer (Honeywell), Intern (SAP
+                        Labs), and Graduate Research Assistant, contributing to enterprise systems and co-authoring a
+                        published research paper.</li>
                 </ul>
             </div>
             <div class="job">
                 <h3>Co-Founder and Software Engineer @ Bridge | August 2013- December 2015</h3>
-                <!-- <h4>Bridge | August 2013- December 2015</h4> -->
                 <ul>
                     <li>Bootstrapped the startup with a mission to deliver efficient and digital ordering and checkout
                         experience to restaurant guests and staff.</li>
-                    <li>Designed, developed and marketed tablet ordering system composed of native applications in
-                        Android & Windows made with Java, SQLite, C#, NET, WPF, LINQ, SQL Server, socket programming and
-                        multi-threading that followed client-server model.</li>
-                    <li>Created and sold feature rich RFID Cafeteria Management Solution written in C#, NET, WinForms to
-                        Raychem RPG, currently used by 4000+ users daily, reducing operating cost of each cafeteria by
-                        25%.
+                    <li>Created and sold feature rich RFID Cafeteria Management Solution to Raychem RPG,
+                        currently used by 4000+ users daily, reducing their cafeteria operating cost by 25%.
                     </li>
                 </ul>
             </div>
@@ -186,7 +195,31 @@
     </footer>
     <script>
         document.getElementById('current-year').textContent = new Date().getFullYear();
+
+        const summarySection = document.getElementById('summary');
+        const summaries = summarySection.querySelectorAll('.summary-content');
+        let currentSummaryIndex = 0;
+
+        summarySection.addEventListener('click', () => {
+            summaries[currentSummaryIndex].classList.add('hidden');
+            currentSummaryIndex = (currentSummaryIndex + 1) % summaries.length;
+            summaries[currentSummaryIndex].classList.remove('hidden');
+        });
+
+        const nameSection = document.querySelector('.name-section');
+        const subtitles = nameSection.querySelectorAll('.subtitle');
+        let currentSubtitleIndex = 0;
+
+        nameSection.addEventListener('click', () => {
+            subtitles[currentSubtitleIndex].classList.add('hidden');
+            currentSubtitleIndex = (currentSubtitleIndex + 1) % subtitles.length;
+            subtitles[currentSubtitleIndex].classList.remove('hidden');
+        });
     </script>
+</body>
+
+</html>
+</script>
 </body>
 
 </html>

@@ -41,28 +41,28 @@ header .name-section {
 }
 
 header .name-section h1 {
-    font-size: 2.2rem;
+    font-size: 1.5rem;
     margin-bottom: 0.5rem;
 }
 
 header .name-section p {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
 }
 
 /* Contact Section */
 header .contact-section {
     font-weight: 400;
-    line-height: 1.6;
+    line-height: 1;
     color: #333;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     gap: 1rem;
-    font-size: 0.75rem;
 }
 
 header .contact-section p {
     margin: 0;
+    font-size: 0.75rem;
 }
 
 header .contact-section a {
@@ -125,7 +125,7 @@ main {
 }
 
 h2 {
-    font-size: 1.4rem;
+    font-size: 0.9rem;
     /* Reduced font size */
     color: rgb(123, 123, 123);
     /* Neutral tone */
@@ -136,8 +136,8 @@ section {
     margin-bottom: 1.5rem;
 }
 
-#about p {
-    font-size: 0.9rem;
+#summary p {
+    font-size: 0.80rem;
 }
 
 /* Skills Section */
@@ -153,7 +153,7 @@ section {
     color: #fff;
     padding: 0.4rem 0.8rem;
     border-radius: 20px;
-    font-size: 0.8rem;
+    font-size: 0.7rem;
     /* Reduced font size */
 }
 
@@ -164,7 +164,7 @@ section {
 
 .job h3 {
     color: #495057;
-    font-size: 1rem;
+    font-size: 0.85rem;
     /* Reduced font size */
     margin-bottom: 0.2rem;
 }
@@ -184,7 +184,7 @@ section {
 .job ul {
     list-style-type: disc;
     margin-left: 1.5rem;
-    font-size: 0.85rem;
+    font-size: 0.80rem;
     /* Reduced font size */
 }
 
@@ -225,4 +225,8 @@ footer p {
 .education-item p {
     font-size: 0.85rem;
     color: #555;
+}
+
+.hidden {
+    display: none;
 }
