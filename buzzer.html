@@ -151,29 +151,23 @@
         }
 
         .controls {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            display: flex; /* Changed from grid to flex for horizontal layout */
             gap: 12px;
-            padding: 10px 20px;
-            overflow-y: auto; /* Enable vertical scroll */
-            overflow-x: hidden;
+            padding: 10px 20px 20px 20px;
+            overflow-x: auto; /* Enable horizontal scroll */
+            overflow-y: hidden;
+            -webkit-overflow-scrolling: touch; /* Smooth scroll on iOS */
+            scrollbar-width: none; /* Hide scrollbar for cleaner look */
         }
         
-        /* Subtle Scrollbar */
+        /* Hide scrollbar for Chrome/Safari */
         .controls::-webkit-scrollbar {
-            width: 6px;
-        }
-        .controls::-webkit-scrollbar-track {
-            background: rgba(0,0,0,0.1);
-        }
-        .controls::-webkit-scrollbar-thumb {
-            background: rgba(255,255,255,0.2);
-            border-radius: 3px;
+            display: none;
         }
         
         .theme-card {
-            /* min-width removed in favor of grid sizing */
-            height: 90px;
+            min-width: 85px; /* Restored min-width so they don't squish */
+            height: 95px;
             background: #2d3436;
             border-radius: 12px;
             display: flex;
@@ -188,6 +182,7 @@
             cursor: pointer;
             border: 2px solid transparent;
             position: relative;
+            flex-shrink: 0; /* Important: prevents items from shrinking to fit screen */
         }
 
         .theme-card.active {
