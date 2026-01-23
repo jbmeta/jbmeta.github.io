@@ -249,75 +249,105 @@
     <script>
         // --- AUDIO CONFIGURATION ---
         
-        // Updated Broken Links to reliable Mixkit Active Storage URLs.
+        // Reliable Sound Sources (Mixkit / Pixabay / Google)
         const themes = {
             buzzer: { 
-                color: '#eb4d4b', // Red
+                color: '#eb4d4b', 
                 dark: '#c0392b',
-                // New reliable Fail Buzzer (Mixkit)
                 url: 'https://assets.mixkit.co/active_storage/sfx/950/950-preview.mp3' 
             },
             applause: { 
-                color: '#6c5ce7', // Purple
+                color: '#6c5ce7', 
                 dark: '#5f27cd',
-                // This one was confirmed working (Pixabay)
                 url: 'https://cdn.pixabay.com/audio/2021/08/04/audio_12b0c7443c.mp3'
             },
             cheer: { 
-                color: '#00b894', // Teal/Green
+                color: '#00b894', 
                 dark: '#009432',
-                // Updated Cheer to Mixkit
                 url: 'https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3' 
             },
             laser: { 
-                color: '#0984e3', // Blue
+                color: '#0984e3', 
                 dark: '#0652dd',
-                // Updated Laser to Mixkit
                 url: 'https://assets.mixkit.co/active_storage/sfx/1678/1678-preview.mp3'
             },
             dog: { 
-                color: '#e67e22', // Orange/Brown
+                color: '#e67e22', 
                 dark: '#d35400',
-                // Google Animal Sound (Very Stable)
                 url: 'https://www.google.com/logos/fnbx/animal_sounds/dog.mp3'
             },
             meow: { 
-                color: '#fd79a8', // Pink
+                color: '#fd79a8', 
                 dark: '#e84393',
-                // Google Animal Sound (Very Stable)
                 url: 'https://www.google.com/logos/fnbx/animal_sounds/cat.mp3'
             },
             lion: { 
-                color: '#f1c40f', // Yellow/Gold
+                color: '#f1c40f', 
                 dark: '#f39c12',
-                // Google Animal Sound (Very Stable)
                 url: 'https://www.google.com/logos/fnbx/animal_sounds/lion.mp3'
             }
         };
 
         // --- AUDIO ENGINE ---
         
-        const player = new Audio();
+        // Master player used for Pre-loading
+        const masterPlayer = new Audio();
         let currentTheme = 'buzzer';
+        let wakeLock = null;
 
-        // Error listener for debugging
-        player.addEventListener('error', (e) => {
-            console.error("Error loading sound:", player.src, e);
+        // Error listener
+        masterPlayer.addEventListener('error', (e) => {
+            console.error("Error loading sound:", masterPlayer.src, e);
         });
 
         // Initialize
         function init() {
-            // Set initial theme
             setTheme('buzzer');
             
-            // Allow iOS to play audio on first touch anywhere
-            document.body.addEventListener('touchstart', function() {
-                // Just creating an empty buffer to warm up the engine
-                player.load();
-            }, { once: true });
+            // Interaction Listener for:
+            // 1. Audio Unlocking (iOS)
+            // 2. Wake Lock Request
+            const unlockHandler = async function() {
+                // Audio warm up
+                masterPlayer.load();
+                
+                // Request Wake Lock
+                requestWakeLock();
+                
+                // Remove listener after first interaction
+                document.body.removeEventListener('touchstart', unlockHandler);
+                document.body.removeEventListener('click', unlockHandler);
+            };
+
+            document.body.addEventListener('touchstart', unlockHandler);
+            document.body.addEventListener('click', unlockHandler);
+            
+            // Re-acquire lock if tab visibility changes
+            document.addEventListener('visibilitychange', async () => {
+                if (wakeLock !== null && document.visibilityState === 'visible') {
+                    requestWakeLock();
+                }
+            });
         }
 
-        // Theme Switcher Logic
+        // --- WAKE LOCK (Keep Screen On) ---
+        async function requestWakeLock() {
+            try {
+                if ('wakeLock' in navigator) {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                    console.log('Wake Lock active');
+                    wakeLock.addEventListener('release', () => {
+                        console.log('Wake Lock released');
+                    });
+                }
+            } catch (err) {
+                // Wake Lock might be denied if battery is low or not allowed
+                console.log('Wake Lock denied:', err.name, err.message);
+            }
+        }
+
+        // --- THEME & AUDIO LOGIC ---
+
         window.setTheme = function(themeKey) {
             currentTheme = themeKey;
             const config = themes[themeKey];
@@ -332,24 +362,33 @@
                 if(card.dataset.theme === themeKey) card.classList.add('active');
             });
 
-            // 2. Audio Pre-loading (Critical for realism/speed)
-            player.src = config.url;
-            player.load(); // Forces browser to buffer the MP3 immediately
+            // 2. Audio Pre-loading
+            // We set source on the master player to force the browser to buffer it
+            masterPlayer.src = config.url;
+            masterPlayer.load(); 
         };
 
-        // Playback Logic
         function playSound() {
-            // Reset to 0 so we can spam the button
-            player.currentTime = 0;
+            // POLYPHONY IMPLEMENTATION:
+            // Instead of playing 'masterPlayer' directly (which would cut off previous sounds),
+            // we clone the node. This creates a lightweight copy that shares the 
+            // buffered audio data, allowing for "Spamming" / Overlapping sounds.
             
-            // Play
-            const promise = player.play();
+            const clone = masterPlayer.cloneNode();
+            
+            // Play the clone
+            const promise = clone.play();
             
             if (promise !== undefined) {
                 promise.catch(error => {
-                    console.log("Autoplay prevented or network error. interact with screen first.");
+                    console.log("Autoplay prevented or network error.", error);
                 });
             }
+            
+            // Optional: Garbage collection helper (though browsers handle this well)
+            clone.addEventListener('ended', () => {
+                clone.remove();
+            });
         }
 
         // --- INTERACTION HANDLING ---
@@ -357,13 +396,17 @@
         const btn = document.getElementById('buzzer-btn');
 
         function triggerBuzzer(e) {
-            // Prevent scrolling or double-firing
             if(e.cancelable && e.type === 'touchstart') e.preventDefault();
             
-            // 1. Sound
+            // 1. HAPTIC FEEDBACK (Vibration)
+            if (navigator.vibrate) {
+                navigator.vibrate(50); // 50ms pulse
+            }
+
+            // 2. Sound (Polyphonic)
             playSound();
 
-            // 2. Visuals
+            // 3. Visuals
             btn.classList.add('pressed');
             
             // Screen Shake
@@ -379,13 +422,11 @@
             btn.classList.remove('pressed');
         }
 
-        // Ripple Effect Calculator
         function createRipple(e) {
             const circle = document.createElement("span");
             const diameter = Math.max(btn.clientWidth, btn.clientHeight);
             const radius = diameter / 2;
             
-            // Get coordinates (Touch vs Mouse)
             let clientX, clientY;
             if (e.touches && e.touches.length > 0) {
                 clientX = e.touches[0].clientX;
@@ -409,11 +450,9 @@
         }
 
         // Event Listeners
-        // 'touchstart' is used for zero-latency on mobile (faster than click)
         btn.addEventListener('touchstart', triggerBuzzer, { passive: false });
         btn.addEventListener('touchend', releaseBuzzer);
         
-        // Mouse fallbacks for desktop
         btn.addEventListener('mousedown', triggerBuzzer);
         btn.addEventListener('mouseup', releaseBuzzer);
         btn.addEventListener('mouseleave', releaseBuzzer);
