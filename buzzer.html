@@ -17,13 +17,27 @@
         body {
             margin: 0;
             padding: 0;
+            /* Fallback for older browsers */
             height: 100vh;
+            /* Fix for mobile browsers (accounts for address bar) */
+            height: 100dvh; 
             background-color: var(--bg);
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             display: flex;
             flex-direction: column;
             overflow: hidden;
             transition: background-color 0.4s ease;
+        }
+
+        /* Header Area */
+        header {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            z-index: 20;
+            flex-shrink: 0; /* Prevent header from squishing too much */
         }
 
         /* Header Area */
@@ -75,6 +89,7 @@
             justify-content: center;
             align-items: center;
             position: relative;
+            min-height: 0; /* Allows flex child to shrink properly */
         }
 
         #buzzer-btn {
@@ -128,8 +143,11 @@
         .controls-container {
             background: rgba(0,0,0,0.3);
             backdrop-filter: blur(10px);
+            /* Ensure safe area for iPhone X+ home bar */
             padding-bottom: env(safe-area-inset-bottom, 20px);
             border-top: 1px solid rgba(255,255,255,0.1);
+            flex-shrink: 0; /* Prevent footer from being pushed off */
+            max-height: 30vh; /* Don't let controls take over screen on landscape */
         }
 
         .controls-label {
@@ -399,8 +417,14 @@
             if(e.cancelable && e.type === 'touchstart') e.preventDefault();
             
             // 1. HAPTIC FEEDBACK (Vibration)
+            // Changed to array format [50] for better Android compatibility
+            // Wrapped in try-catch to prevent errors on unsupported devices
             if (navigator.vibrate) {
-                navigator.vibrate(50); // 50ms pulse
+                try {
+                    navigator.vibrate([75]); // Slightly stronger pulse
+                } catch(err) {
+                    // Fail silently
+                }
             }
 
             // 2. Sound (Polyphonic)
