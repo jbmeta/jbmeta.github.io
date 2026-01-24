@@ -98,7 +98,8 @@
             text-shadow: 0 2px 4px rgba(0,0,0,0.3);
             cursor: pointer;
             position: relative;
-            transition: all 0.05s cubic-bezier(0.1, 0.7, 1.0, 0.1);
+            /* Made transition snappier for "bouncy" feel */
+            transition: transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.1s; 
             outline: none;
             touch-action: manipulation;
             z-index: 10;
@@ -109,13 +110,29 @@
         }
 
         #buzzer-btn:active, #buzzer-btn.pressed {
-            transform: translateY(15px);
+            transform: scale(0.95) translateY(10px);
             box-shadow: 
                 0 0 0 var(--primary-dark), 
-                0 10px 10px rgba(0,0,0,0.4);
+                0 5px 10px rgba(0,0,0,0.4);
         }
 
-        /* Visual Ripple Effect */
+        /* Particle Explosion Effect */
+        .particle {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 15;
+            animation: particle-anim 0.8s ease-out forwards;
+        }
+
+        @keyframes particle-anim {
+            0% { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(0) rotate(180deg); opacity: 0; }
+        }
+
+        /* Visual Ripple Effect (Internal) */
         .ripple {
             position: absolute;
             border-radius: 50%;
@@ -217,7 +234,7 @@
     </header>
 
     <main>
-        <button id="buzzer-btn">PUSH</button>
+        <button id="buzzer-btn">BUZZ!</button>
     </main>
 
     <div class="controls-container">
@@ -230,85 +247,81 @@
     <script>
         // --- AUDIO CONFIGURATION ---
         
-        // Moved icons and labels here for dynamic generation
+        // Added 'text' field for dynamic button labels
         const themes = {
             buzzer: { 
-                label: 'Buzzer', icon: '🚨',
+                label: 'Buzzer', icon: '🚨', text: 'BUZZ!',
                 color: '#eb4d4b', dark: '#c0392b',
                 url: 'https://assets.mixkit.co/active_storage/sfx/950/950-preview.mp3' 
             },
-            airhorn: {
-                label: 'Air Horn', icon: '📣',
-                color: '#f0932b', dark: '#d35400',
-                url: 'https://assets.mixkit.co/active_storage/sfx/967/967-preview.mp3'
-            },
             ding: {
-                label: 'Correct', icon: '✅',
+                label: 'Correct', icon: '✅', text: 'YES!',
                 color: '#26de81', dark: '#20bf6b',
                 url: 'https://assets.mixkit.co/active_storage/sfx/571/571-preview.mp3'
             },
             fail: {
-                label: 'Fail', icon: '📉',
+                label: 'Fail', icon: '📉', text: 'NO!',
                 color: '#95a5a6', dark: '#7f8c8d',
                 url: 'https://assets.mixkit.co/active_storage/sfx/953/953-preview.mp3'
             },
-            applause: { 
-                label: 'Applause', icon: '👏',
-                color: '#6c5ce7', dark: '#5f27cd',
-                url: 'https://cdn.pixabay.com/audio/2021/08/04/audio_12b0c7443c.mp3'
+            levelup: {
+                label: 'Level Up', icon: '🌟', text: 'UP!',
+                color: '#f1c40f', dark: '#f39c12',
+                url: 'https://assets.mixkit.co/active_storage/sfx/2065/2065-preview.mp3'
             },
-            cheer: { 
-                label: 'Cheer', icon: '🎉',
-                color: '#00b894', dark: '#009432',
-                url: 'https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3' 
-            },
-            drum: {
-                label: 'Drum Roll', icon: '🥁',
-                color: '#4b4b4b', dark: '#2d3436',
-                url: 'https://assets.mixkit.co/active_storage/sfx/2381/2381-preview.mp3'
+            arcade: {
+                label: 'Arcade', icon: '🕹️', text: 'GO!',
+                color: '#e84118', dark: '#c23616',
+                // Classic 8-bit powerup/bonus sound
+                url: 'https://assets.mixkit.co/active_storage/sfx/2018/2018-preview.mp3'
             },
             crickets: {
-                label: 'Crickets', icon: '🦗',
+                label: 'Crickets', icon: '🦗', text: '...',
                 color: '#badc58', dark: '#6ab04c',
                 url: 'https://assets.mixkit.co/active_storage/sfx/220/220-preview.mp3'
             },
             laser: { 
-                label: 'Laser', icon: '🔫',
+                label: 'Laser', icon: '🔫', text: 'ZAP!',
                 color: '#0984e3', dark: '#0652dd',
                 url: 'https://assets.mixkit.co/active_storage/sfx/1678/1678-preview.mp3'
             },
             dog: { 
-                label: 'Dog', icon: '🐶',
+                label: 'Dog', icon: '🐶', text: 'WOOF!',
                 color: '#e67e22', dark: '#d35400',
                 url: 'https://www.google.com/logos/fnbx/animal_sounds/dog.mp3'
             },
             meow: { 
-                label: 'Meow', icon: '🐱',
+                label: 'Meow', icon: '🐱', text: 'MEOW!',
                 color: '#fd79a8', dark: '#e84393',
                 url: 'https://www.google.com/logos/fnbx/animal_sounds/cat.mp3'
             },
             lion: { 
-                label: 'Lion', icon: '🦁',
+                label: 'Lion', icon: '🦁', text: 'ROAR!',
                 color: '#f1c40f', dark: '#f39c12',
                 url: 'https://www.google.com/logos/fnbx/animal_sounds/lion.mp3'
             },
+            pig: {
+                label: 'Pig', icon: '🐷', text: 'OINK!',
+                color: '#ff9ff3', dark: '#f368e0',
+                url: 'https://www.google.com/logos/fnbx/animal_sounds/pig.mp3'
+            },
             cow: { 
-                label: 'Cow', icon: '🐮',
+                label: 'Cow', icon: '🐮', text: 'MOO!',
                 color: '#00cec9', dark: '#00b894',
                 url: 'https://www.google.com/logos/fnbx/animal_sounds/cow.mp3'
             },
             rooster: { 
-                label: 'Rooster', icon: '🐓',
+                label: 'Rooster', icon: '🐓', text: 'CLUCK!',
                 color: '#d63031', dark: '#c0392b',
                 url: 'https://www.google.com/logos/fnbx/animal_sounds/rooster.mp3'
             },
             elephant: { 
-                label: 'Elephant', icon: '🐘',
+                label: 'Elephant', icon: '🐘', text: 'TOOT!',
                 color: '#a4b0be', dark: '#747d8c',
                 url: 'https://www.google.com/logos/fnbx/animal_sounds/elephant.mp3'
             },
             duck: { 
-                label: 'Duck', icon: '🦆',
+                label: 'Duck', icon: '🦆', text: 'QUACK!',
                 color: '#f9ca24', dark: '#f0932b',
                 url: 'https://www.google.com/logos/fnbx/animal_sounds/duck.mp3'
             }
@@ -402,6 +415,10 @@
             root.style.setProperty('--primary', config.color);
             root.style.setProperty('--primary-dark', config.dark);
             
+            // Update Text
+            const btn = document.getElementById('buzzer-btn');
+            btn.innerText = config.text || "PUSH";
+
             document.querySelectorAll('.theme-card').forEach(card => {
                 card.classList.remove('active');
                 if(card.dataset.theme === themeKey) card.classList.add('active');
@@ -425,6 +442,32 @@
                 clone.remove();
             });
         }
+        
+        // --- VISUAL EFFECTS ---
+
+        function createParticles(x, y, color) {
+            for (let i = 0; i < 15; i++) {
+                const p = document.createElement('div');
+                p.classList.add('particle');
+                p.style.left = x + 'px';
+                p.style.top = y + 'px';
+                p.style.backgroundColor = color;
+                
+                // Random angle and distance
+                const angle = Math.random() * Math.PI * 2;
+                const velocity = 80 + Math.random() * 120; // Spread distance
+                const tx = Math.cos(angle) * velocity;
+                const ty = Math.sin(angle) * velocity;
+                
+                p.style.setProperty('--tx', `${tx}px`);
+                p.style.setProperty('--ty', `${ty}px`);
+                
+                document.body.appendChild(p);
+                
+                // Cleanup
+                setTimeout(() => p.remove(), 800);
+            }
+        }
 
         // --- INTERACTION HANDLING ---
 
@@ -445,16 +488,32 @@
             // 2. Sound (Polyphonic)
             playSound();
 
-            // 3. Visuals
+            // 3. Visuals (Shake + Press)
             btn.classList.add('pressed');
             
-            // Screen Shake
+            // 4. Screen Shake
             document.body.classList.remove('shake');
             void document.body.offsetWidth; // Force reflow
             document.body.classList.add('shake');
 
-            // Ripple
+            // 5. Particles & Ripple
+            // Calculate coords for particles
+            let clientX, clientY;
+            if (e.touches && e.touches.length > 0) {
+                clientX = e.touches[0].clientX;
+                clientY = e.touches[0].clientY;
+            } else {
+                clientX = e.clientX;
+                clientY = e.clientY;
+            }
+            
+            // Ripple inside button
             createRipple(e);
+            
+            // Particles outside button
+            const config = themes[currentTheme];
+            // Use lighter color for particles so they show up against background
+            createParticles(clientX, clientY, config.color);
         }
 
         function releaseBuzzer() {
