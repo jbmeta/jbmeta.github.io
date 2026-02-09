@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VibeSync Visualizer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #000;
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            touch-action: none; /* Prevent standard touch actions like scrolling */
+        }
+        
+        #canvas-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        #ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0,0,0,0.8);
+            transition: opacity 0.5s ease;
+        }
+
+        .hidden-ui {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* Pulsating start button */
+        .glow-btn {
+            box-shadow: 0 0 10px #ff00de, 0 0 20px #ff00de, 0 0 40px #ff00de;
+            animation: pulse-glow 2s infinite;
+        }
+
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 10px #ff00de, 0 0 20px #ff00de; }
+            50% { box-shadow: 0 0 20px #ff00de, 0 0 40px #ff00de, 0 0 60px #ff00de; }
+            100% { box-shadow: 0 0 10px #ff00de, 0 0 20px #ff00de; }
+        }
+
+        /* Small info text at bottom */
+        #mode-indicator {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 5;
+            background: rgba(0,0,0,0.5);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            opacity: 0; /* Hidden by default, shown on tap */
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Canvas for Visuals -->
+    <div id="canvas-container">
+        <canvas id="visualizer"></canvas>
+    </div>
+
+    <!-- Mode Toast -->
+    <div id="mode-indicator">Mode: Solid Pulse</div>
+
+    <!-- Start / UI Screen -->
+    <div id="ui-layer">
+        <div class="text-center p-6 max-w-md">
+            <h1 class="text-5xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500">
+                VIBE SYNC
+            </h1>
+            <p class="text-gray-300 mb-8 text-lg">
+                Concert Audio Visualizer
+            </p>
+            
+            <div class="bg-gray-800/80 p-4 rounded-xl mb-8 text-sm text-left border border-gray-700">
+                <p class="mb-2">🎵 <strong>Microphone:</strong> Creates visuals from ambient sound.</p>
+                <p class="mb-2">📱 <strong>Full Screen:</strong> Immersive experience.</p>
+                <p class="mb-2">💡 <strong>Wake Lock:</strong> Keeps your screen on.</p>
+                <p class="text-yellow-400 text-xs mt-3">⚠️ Warning: Contains flashing lights.</p>
+            </div>
+
+            <button id="start-btn" class="bg-fuchsia-600 hover:bg-fuchsia-500 text-white font-bold py-4 px-10 rounded-full text-xl transition transform hover:scale-105 active:scale-95 glow-btn">
+                START PARTY
+            </button>
+            
+            <p id="error-msg" class="text-red-500 mt-4 text-sm hidden"></p>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * VibeSync Core Logic
+         * Handles AudioContext, Canvas Rendering, and WakeLock
+         */
+
+        const canvas = document.getElementById('visualizer');
+        const ctx = canvas.getContext('2d');
+        const uiLayer = document.getElementById('ui-layer');
+        const startBtn = document.getElementById('start-btn');
+        const errorMsg = document.getElementById('error-msg');
+        const modeIndicator = document.getElementById('mode-indicator');
+
+        // State
+        let isRunning = false;
+        let audioContext, analyser, microphone, dataArray;
+        let wakeLock = null;
+        let animationId;
+        
+        // Visualizer Modes
+        const MODES = ['SOLID_PULSE', 'WAVEFORM', 'BASS_ORBS', 'NEON_RAIN'];
+        let currentModeIndex = 0;
+        let hueOffset = 0; // For color cycling
+
+        // --- Initialization ---
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        startBtn.addEventListener('click', async () => {
+            try {
+                await startApp();
+                uiLayer.classList.add('hidden-ui');
+                showModeToast();
+            } catch (err) {
+                console.error(err);
+                errorMsg.textContent = "Error: " + err.message + ". Please allow microphone access.";
+                errorMsg.classList.remove('hidden');
+            }
+        });
+
+        // Toggle modes on canvas click
+        canvas.addEventListener('click', () => {
+            if (!isRunning) return;
+            currentModeIndex = (currentModeIndex + 1) % MODES.length;
+            showModeToast();
+        });
+
+        function showModeToast() {
+            modeIndicator.textContent = MODES[currentModeIndex].replace('_', ' ');
+            modeIndicator.style.opacity = '1';
+            setTimeout(() => {
+                modeIndicator.style.opacity = '0';
+            }, 2000);
+        }
+
+        // --- Core Audio & System Setup ---
+
+        async function startApp() {
+            // 1. Audio Setup
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            
+            // Get Mic Stream
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            microphone = audioContext.createMediaStreamSource(stream);
+            
+            // Analyser Setup
+            analyser = audioContext.createAnalyser();
+            analyser.fftSize = 512; // Resolution of frequency data
+            microphone.connect(analyser); // Mic -> Analyser (NOT to destination to avoid feedback loop)
+
+            const bufferLength = analyser.frequencyBinCount;
+            dataArray = new Uint8Array(bufferLength);
+
+            // 2. Fullscreen
+            try {
+                if (document.documentElement.requestFullscreen) {
+                    await document.documentElement.requestFullscreen();
+                } else if (document.documentElement.webkitRequestFullscreen) { /* Safari */
+                    await document.documentElement.webkitRequestFullscreen();
+                }
+            } catch (e) {
+                console.log("Fullscreen request failed (likely denied or not user-triggered):", e);
+            }
+
+            // 3. Wake Lock
+            try {
+                if ('wakeLock' in navigator) {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                    wakeLock.addEventListener('release', () => {
+                        console.log('Wake Lock released');
+                    });
+                }
+            } catch (err) {
+                console.log(`Wake Lock error: ${err.name}, ${err.message}`);
+            }
+
+            // 4. Start Loop
+            isRunning = true;
+            renderLoop();
+        }
+
+        // --- Visualizer Logic ---
+
+        function getAverageVolume(array) {
+            let values = 0;
+            let average;
+            const length = array.length;
+            for (let i = 0; i < length; i++) {
+                values += array[i];
+            }
+            average = values / length;
+            return average;
+        }
+
+        function getBassEnergy(array) {
+            // Bass is usually lower frequencies, first ~10-20% of the FFT array
+            let values = 0;
+            const bassLength = Math.floor(array.length * 0.15); 
+            for (let i = 0; i < bassLength; i++) {
+                values += array[i];
+            }
+            return values / bassLength;
+        }
+
+        function renderLoop() {
+            if (!isRunning) return;
+            animationId = requestAnimationFrame(renderLoop);
+
+            // Get Audio Data
+            analyser.getByteFrequencyData(dataArray);
+            
+            const vol = getAverageVolume(dataArray); // 0 - 255
+            const bass = getBassEnergy(dataArray);   // 0 - 255
+            
+            // Global Color Cycle
+            hueOffset += 0.5;
+            if(hueOffset > 360) hueOffset = 0;
+
+            // Clear Screen
+            // Note: Some modes might want trails, so we use alpha fill
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.2)'; // 0.2 creates a slight trail effect
+            if (MODES[currentModeIndex] === 'SOLID_PULSE') ctx.fillStyle = 'rgba(0,0,0,1)'; // No trails for solid
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Dispatch Render Mode
+            switch (MODES[currentModeIndex]) {
+                case 'SOLID_PULSE':
+                    renderSolidPulse(vol, bass);
+                    break;
+                case 'WAVEFORM':
+                    renderWaveform();
+                    break;
+                case 'BASS_ORBS':
+                    renderBassOrbs(vol, bass);
+                    break;
+                case 'NEON_RAIN':
+                    renderNeonRain(dataArray);
+                    break;
+            }
+        }
+
+        // --- Mode 1: Solid Pulse ---
+        // Simple, effective. Screen fills with color based on volume.
+        function renderSolidPulse(vol, bass) {
+            // Threshold to trigger "beat"
+            let lightness = 5; 
+            if (bass > 140) {
+                lightness = map(bass, 140, 255, 20, 80);
+            } else if (vol > 50) {
+                lightness = map(vol, 50, 150, 5, 40);
+            }
+
+            // Color changes over time (hueOffset) but jumps on beat
+            const hue = (hueOffset + (bass > 180 ? 180 : 0)) % 360;
+            
+            ctx.fillStyle = `hsl(${hue}, 100%, ${lightness}%)`;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+
+        // --- Mode 2: Waveform ---
+        // Classic oscilloscope line
+        function renderWaveform() {
+            const bufferLength = analyser.frequencyBinCount;
+            const timeData = new Uint8Array(bufferLength);
+            analyser.getByteTimeDomainData(timeData); // Get waveform data
+
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = `hsl(${hueOffset}, 100%, 50%)`;
+            ctx.beginPath();
+
+            const sliceWidth = canvas.width * 1.0 / bufferLength;
+            let x = 0;
+
+            for(let i = 0; i < bufferLength; i++) {
+                const v = timeData[i] / 128.0;
+                const y = v * canvas.height/2;
+
+                if(i === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+
+                x += sliceWidth;
+            }
+
+            ctx.lineTo(canvas.width, canvas.height/2);
+            ctx.stroke();
+        }
+
+        // --- Mode 3: Bass Orbs ---
+        // Center circle pulsates with bass
+        function renderBassOrbs(vol, bass) {
+            const cx = canvas.width / 2;
+            const cy = canvas.height / 2;
+            
+            // Map bass to radius
+            const radius = map(bass, 0, 255, 50, Math.min(canvas.width, canvas.height) * 0.4);
+            const secondaryRadius = map(vol, 0, 255, 20, Math.min(canvas.width, canvas.height) * 0.8);
+
+            // Draw Outer Ring (Treble/Vol)
+            ctx.beginPath();
+            ctx.arc(cx, cy, secondaryRadius, 0, 2 * Math.PI);
+            ctx.strokeStyle = `hsl(${(hueOffset + 180) % 360}, 80%, 50%)`;
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Draw Inner Orb (Bass)
+            ctx.beginPath();
+            ctx.arc(cx, cy, radius, 0, 2 * Math.PI);
+            ctx.fillStyle = `hsl(${hueOffset}, 100%, 50%)`;
+            
+            // Add glow
+            ctx.shadowBlur = 20;
+            ctx.shadowColor = `hsl(${hueOffset}, 100%, 50%)`;
+            ctx.fill();
+            ctx.shadowBlur = 0;
+        }
+
+        // --- Mode 4: Neon Rain ---
+        // Bars falling or rising based on frequency spectrum
+        function renderNeonRain(data) {
+            const barWidth = (canvas.width / data.length) * 2.5;
+            let x = 0;
+            
+            for(let i = 0; i < data.length; i++) {
+                // Ignore high frequencies that usually have no data in music
+                if (i > data.length * 0.7) break;
+
+                const barHeight = map(data[i], 0, 255, 0, canvas.height * 0.8);
+                
+                const hue = i + hueOffset;
+                ctx.fillStyle = `hsl(${hue}, 100%, 50%)`;
+                
+                // Draw mirrored bars
+                ctx.fillRect(x, canvas.height/2 - barHeight/2, barWidth, barHeight);
+                
+                x += barWidth + 1;
+            }
+        }
+
+        // Utility: Map helper
+        function map(value, low1, high1, low2, high2) {
+            return low2 + (high2 - low2) * (value - low1) / (high1 - low1);
+        }
+
+        // Re-acquire Wake Lock if visibility changes (e.g. user tabs out and back)
+        document.addEventListener('visibilitychange', async () => {
+            if (wakeLock !== null && document.visibilityState === 'visible') {
+                try {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                } catch(e) { console.log('Wake lock re-acquire failed'); }
+            }
+        });
+
+    </script>
+</body>
+</html>
